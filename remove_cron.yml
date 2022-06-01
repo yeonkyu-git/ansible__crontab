@@ -1,0 +1,15 @@
+---
+- name: Set cron job monitoring shell script 
+  gather_facts: no
+  hosts: CentOS
+
+  tasks:
+    - name: remove cron job 
+      ansible.builtin.cron:
+        name: monitoring (regular check)
+        state: absent
+
+        
+
+
+

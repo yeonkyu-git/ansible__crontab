@@ -1,0 +1,44 @@
+---
+- name: Set cron job monitoring shell script 
+  gather_facts: no
+  hosts: CentOS
+
+  tasks:
+    - name: make the directroy for shellScript 
+      file:
+        path: /home/vagrant/shellScript
+        state: directory
+        mode: 0755
+    
+    - name: transfer run shellScript file to Agent Server
+      copy: src={{ item.src }} dest={{ item.dest }} mode=0744
+      with_items:
+        - { src: '/home/vagrant/regular_chk.sh', dest: '/home/vagrant/shellScript/regular_chk.sh' }
+        - { src: '/home/vagrant/run_regular_chk.sh', dest: '/home/vagrant/shellScript/run_regular_chk.sh' }
+        
+  
+    - name: make the history directory 
+      file:
+        path: /tmp/history
+        state: directory
+        mode: 0755
+
+    - name: remove cron job 
+      ansible.builtin.cron:
+        name: monitoring (regular check)
+        state: absent
+
+    - name: enroll cron job (under /etc/cron.d)
+      ansible.builtin.cron:
+        name: monitoring (regular check)
+        month: "*"
+        weekday: "*"
+        day: "*"
+        hour: "*"
+        minute: "*"
+        user: vagrant
+        job: "/home/vagrant/shellScript/run_regular_chk.sh"
+        
+
+
+
